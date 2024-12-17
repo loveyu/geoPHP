@@ -1,7 +1,4 @@
-[![Build Status](https://travis-ci.org/phayes/geoPHP.svg?branch=master)](https://travis-ci.org/phayes/geoPHP)
-
 [geophp.net](https://geophp.net "GeoPHP homepage")
-
 
 GeoPHP is a open-source native PHP library for doing geometry operations. It is written entirely in PHP and 
 can therefore run on shared hosts. It can read and write a wide variety of formats: WKT (including EWKT), WKB (including EWKB), GeoJSON, 
@@ -22,8 +19,9 @@ message. Forks are also welcome, please issue pull requests and I will merge the
 
 Getting Started
 -----------------------
+ * This project is fork from: <https://github.com/phayes/geoPHP>
+ * This project enforces PHP code compatibility to PHP 8.1 and above, and **it has not yet completed all testing**.
 
- * The lastest stable version can always be downloaded at: <https://phayes.github.io/bin/current/geoPHP/geoPHP.tar.gz>
  * Read the API Reference at: <https://geophp.net/api.html>
  * Examples
    * Using geoPHP as a GIS format converter: <http://github.com/phayes/geoPHP/wiki/Example-format-converter>
@@ -35,10 +33,10 @@ Example usage
 
 ```php
 <?php
-include_once('geoPHP.inc');
+use Loveyu\GeoPHP\GeoPHP;
 
 // Polygon WKT example
-$polygon = geoPHP::load('POLYGON((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2))','wkt');
+$polygon = GeoPHP::load('POLYGON((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2))','wkt');
 $area = $polygon->getArea();
 $centroid = $polygon->getCentroid();
 $centX = $centroid->getX();
@@ -56,7 +54,7 @@ $json =
    ]
 }';
 
-$multipoint = geoPHP::load($json, 'json');
+$multipoint = GeoPHP::load($json, 'json');
 $multipoint_points = $multipoint->getComponents();
 $first_wkt = $multipoint_points[0]->out('wkt');
 
@@ -101,7 +99,8 @@ geoPHP, through it's EWKB adapter, has good integration with postGIS. Here's an 
 
 ```php
 <?php
-include_once('geoPHP.inc');
+use Loveyu\GeoPHP\GeoPHP;
+
 $host =     'localhost';
 $database = 'phayes';
 $table =    'test';
@@ -118,7 +117,7 @@ $connection = pg_connect("host=$host dbname=$database user=$user password=$pass"
 $result = pg_fetch_all(pg_query($connection, "SELECT asBinary($column) as geom FROM $table"));
 foreach ($result as $item) {
   $wkb = pg_unescape_bytea($item['geom']); // Make sure to unescape the hex blob
-  $geom = geoPHP::load($wkb, 'ewkb'); // We now a full geoPHP Geometry object
+  $geom = GeoPHP::load($wkb, 'ewkb'); // We now a full geoPHP Geometry object
   
   // Let's insert it back into the database
   $insert_string = pg_escape_bytea($geom->out('ewkb'));
@@ -129,7 +128,7 @@ foreach ($result as $item) {
 $result = pg_fetch_all(pg_query($connection, "SELECT $column as geom FROM $table"));
 foreach ($result as $item) {
   $wkb = pack('H*',$item['geom']);   // Unpacking the hex blob
-  $geom = geoPHP::load($wkb, 'ewkb'); // We now have a geoPHP Geometry
+  $geom = GeoPHP::load($wkb, 'ewkb'); // We now have a geoPHP Geometry
   
   // To insert directly into postGIS we need to unpack the WKB
   $unpacked = unpack('H*', $geom->out('ewkb'));
